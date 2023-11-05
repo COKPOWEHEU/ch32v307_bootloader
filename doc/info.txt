@@ -1,0 +1,18 @@
+0x1fff'f706 (1 byte) - ChipID (0x71 in ch32v307rc)
+
+0x1fff'f70c ???
+
+0x1fff'f7e8..0x1fff'f7f0 (8 bytes) - UniqID
+
+0x1fff'f800..0x1fff'f810 (16 bytes) - User option bytes
+| RDPR  | nRDPR  | USER  | nUSER  |
+| DATA0 | nDATA0 | DATA1 | nDATA1 |
+| WPR0  | nWPR0  | WPR1  | nWPR1  | 
+| WPR2  | nWPR2  | WPR3  | nWPR3  |
+
+RDPR: 0xA5 - not read protected, other - read protected
+USER: bits 7:6(flash:RAM): 0b00(192:128), 0b01(224:96), 0b10(256:64), 0b11(288:32)
+      bit 2, STANDYRST. System is (0) or not (1) reset when entering Standby mode
+      bit 1, STOPRST. System will (0) or not (1) be reset when entering Stop mode
+      bit 0, IWDG_SW. IWDG hardware enable 1-software, 0-hardware
+WPRx: write protection bits. 1-writeable, 0-blocked

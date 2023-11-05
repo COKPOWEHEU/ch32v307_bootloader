@@ -1,0 +1,125 @@
+gp 	= 0x20000838
+
+.option norvc
+	li t0, (0b11<<MSTATUS_FS) | (1<<MSTATUS_MPIE) | (1<<MSTATUS_MIE) #0x6088
+.option rvc
+
+UniqID у меня 87 80 CB 26 3B 38 8D DF
+
+0x2000'0000 - 0x2000'001F - USB Configuration descriptor
+0x2000'0020 - 0x2000'0031 - USB Device descriptor
+[0x2000'0032] - unused ?
+[0x2000'0038] = (initial)0x00090200, вроде не меняется
+[0x2000'003c] = (initial)0xFD = 253, вроде не меняется, как-то связано с частотой
+
+[0x2000'0270]:=[0x1fff'f706] - ChipID (у меня 0x71)
+[0x2000'0051] - USB-OTG address
+[0x2000'0052] - USB-HS address
+done: [0x2000'0300] - usb (both) configuration
+[0x2000'0302] - USB EP0 output size
+[0x2000'0308] - USB EP0 buffer ptr?
+[0x2000'005c] - туда попадает прошивка после дешифровки
+[0x2000'0274] - flash_bytes_remain?
+
+[0x2000'0040] = SystemCoreClock
+[0x2000'0268] - XOR_MASK
+[0x2000'0260] - UniqID_sum (видимо = 0xD7)
+[0x2000'0054] - (SystemCoreClock / 8000000) * 1000
+[0x2000'0056] - (SystemCoreClock / 8000000) & 0xFF
+
+[0x2000'027c] - //из функ_CMD_SET_BAUD baudrate?
+[0x2000'0279] - //из функ_CMD_SET_BAUD 2/1
+
+
+[0x2000'0058] - reply buffer ptr -2016(gp)
+			// (из функ_UART)0280
+			// (из функ_OTG)var + 64
+			// (из функ_USBHS)var + 64 //DMA2_EP2_TX_buffer
+[0x2000'025c] - reply count?
+
+[0x2000'0264](var1) - request buffer ptr
+			// (из функ_UART) 02c0
+			// (из функ_OTG) [0x2000'030c] //DMA_EP2_buffer?
+			// (из функ_USBHS) [0x2000'03e0] //DMA_EP2_RX_buffer?
+
+USBHD
+[0x2000'03f0] - DMA_EP0_buffer
+-1108(gp)[0x2000'03e4] = 0x2000'03f0
+
+[0x2000'0430] - DMA_EP2_RX_buffer
+[0x2000'03e0] = 0x2000'0430
+
+[0x2000'0470] - DMA2_EP2_TX_buffer
+
+USB_OTG
+[0x2000'0314] - DMA_EP0_buffer
+[0x2000'0310] = 0x2000'0314
+
+[0x2000'0354] = DMA_EP2_buffer
+[0x2000'030c] = 0x2000'0354
+
+[0x2000'0302] // в SETUP: = wLength?
+
+[0x2000'0304] // в SETUP: = bRequest
+
+
+#clear/set feature: enable/disable interface, endpoint etc?
+Bus 002 Device 008: ID 4348:55e0 WinChipHead 
+Device Descriptor:
+  bLength                18				0x12
+  bDescriptorType         1				0x01
+  bcdUSB               1.10				0x0101
+  bDeviceClass          255 Vendor Specific Class	0xFF
+  bDeviceSubClass       128 				0x80
+  bDeviceProtocol        85 				0x55
+  bMaxPacketSize0        64				0x40
+  idVendor           0x4348 WinChipHead			0x4348
+  idProduct          0x55e0 				0x55e0
+  bcdDevice           29.00				0x2900
+  iManufacturer           0				0x00
+  iProduct                0 				0x00
+  iSerial                 0				0x00
+  bNumConfigurations      1				0x01
+  
+  
+  Configuration Descriptor:
+    bLength                 9				0x09
+    bDescriptorType         2				0x02
+    wTotalLength       0x0020				
+    bNumInterfaces          1
+    bConfigurationValue     1
+    iConfiguration          0 
+    bmAttributes         0x80
+      (Bus Powered)
+    MaxPower              100mA
+    Interface Descriptor:
+      bLength                 9
+      bDescriptorType         4
+      bInterfaceNumber        0
+      bAlternateSetting       0
+      bNumEndpoints           2
+      bInterfaceClass       255 Vendor Specific Class
+      bInterfaceSubClass    128 
+      bInterfaceProtocol     85 
+      iInterface              0 
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x82  EP 2 IN
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               0
+      Endpoint Descriptor:
+        bLength                 7
+        bDescriptorType         5
+        bEndpointAddress     0x02  EP 2 OUT
+        bmAttributes            2
+          Transfer Type            Bulk
+          Synch Type               None
+          Usage Type               Data
+        wMaxPacketSize     0x0040  1x 64 bytes
+        bInterval               0
+Device Status:     0x0000
